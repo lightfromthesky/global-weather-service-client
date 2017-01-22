@@ -1,0 +1,52 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <label>Country:</label>
+    <input type="text" id="txtCountryName"/>
+    <input type="button" id="btnGetCities" value="Get Cities" onclick="getCitiesByCountryName($('#txtCountryName').val());"/>
+    <br />
+    <br />
+    <div id="divCities" style="overflow:auto; max-height:750px; width:300px; margin-left: 30px">
+        <ul id="lstCities"></ul>
+        <div id="message" style="margin-left: 30px"></div>
+    </div>
+</div>
+<script>
+    function getCitiesByCountryName(countryName)
+    {
+        $.ajax({
+            url: '@Url.Action("GetCitiesByCountry", "Home")',
+            type: 'GET',
+            contentType: 'application/json',
+            data: { countryName: countryName },
+            success: function (data) {
+                $('#lstCities').empty();
+                $('#message').empty();
+
+                if(data == null || data == '')
+                {
+                    $('#message').html("No cities were found!")
+                    return;
+                }
+
+                let parsedJSONData = JSON.parse(data);
+                if(parsedJSONData.length > 0) {
+                    $.each(parsedJSONData, function (i, value) {
+                        $('#lstCities').append("<li>" + value.City + "</li>");
+                    });
+                }
+                else {
+                    $('#message').html("No cities were found!")
+                }
+            },
+            error: function (response) {
+                alert("Error encountered, please contact technical support team!");
+            }
+
+        });
+    }
+</script>
